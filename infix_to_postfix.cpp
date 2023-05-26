@@ -6,7 +6,7 @@
 /*   By: zel-bouz <zel-bouz@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/26 05:33:18 by zel-bouz          #+#    #+#             */
-/*   Updated: 2023/05/26 05:37:35 by zel-bouz         ###   ########.fr       */
+/*   Updated: 2023/05/26 10:26:46 by zel-bouz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,72 +14,92 @@
 using namespace std;
 
 
+static queue<string>	put_error(char c)
+{
+	cout << SYN_ERROR << 'sdsd';
+	cout << RESET<< endl;
+	return queue<string>();
+}
+
+void	push_operand(stack<string>& op_stack, queue<string>& que, map<char, int> prec, string op)
+{
+	char	op1;
+	char	op2;
+
+	if (op_stack.empty())
+	{
+		op_stack.push(op);
+		return ;
+	}
+	op1 = op[0];
+	op2 = op_stack.top()[0];
+	if (op2 == LEFT_B || op2 == RIGHT_B){
+		op_stack.push(op);
+		return ;
+	}
+	while (!op_stack.empty() && (op2 != LEFT_B && op2 != RIGHT_B) && prec[op1] <= prec[op2])
+	{
+		que.push(op_stack.top());
+		op_stack.pop();
+		if (!op_stack.empty())
+			op2 = op_stack.top()[0];
+	}
+	op_stack.push(op);
+}
+
+void	push_num(queue<string>& que, string& exp, int& i)
+{
+	string	num;
+
+	while (i < exp.size() && isdigit(exp[i]))
+		num.push_back(exp[i++]);
+	i--;
+	que.push(num);
+}
+
+int	push_brackets(stack<string>& op_stack, queue<string>& que)
+{
+	while (!op_stack.empty())
+	{
+		if (op_stack.top()[0] == LEFT_B)
+		{
+			op_stack.pop();
+			return (1);
+		}
+		que.push(op_stack.top());
+		op_stack.pop();
+	}
+	return (0);
+}
 queue<string>	infix_to_postfix(string exp, map<char, int> prec)
 {
-	// map<char, int> prec;
 	stack<string>	op_stack;
-	queue<string>	res_stack;
-	string	dt;
+	queue<string>	res_queue;
 
 	for (int i=0; i<exp.size(); i++)
 	{
-		if (!is_token(exp[i])  && exp[i] != LEFT_B && exp[i] != RIGHT_B) {
-			cout << SYN_ERROR << exp[i] << endl;
-			return queue<string>();
-		}
+		if (!is_token(exp[i])  && exp[i] != LEFT_B && exp[i] != RIGHT_B)
+			return (put_error(exp[i]));
 		else if (is_operand(exp[i]))
 		{
-			string op;
+			string	op;
 			op.push_back(exp[i]);
-			if (op_stack.empty() || (op_stack.top()[0] == LEFT_B || op_stack.top()[0] == RIGHT_B)) {
-				op_stack.push(op);
-				continue;
-			}
-			else// 3 + 4 × 2 ÷ ( 1 − 5 ) ^ 2 ^ 3
-			{
-				while (!op_stack.empty() &&  prec[op[0]] <= prec[op_stack.top()[0]] && (op_stack.top()[0] != LEFT_B && op_stack.top()[0] != RIGHT_B))
-				{
-					res_stack.push(op_stack.top());
-					op_stack.pop();
-				}
-				op_stack.push(op);
-			}
+			push_operand(op_stack, res_queue, prec, op);
 		}
 		else if (isdigit(exp[i]))
-		{
-			string dig;
-			while (i < exp.size() && isdigit(exp[i]))
-				dig.push_back(exp[i++]);
-			i--;
-			res_stack.push(dig);
-		}
+			push_num(res_queue, exp, i);
 		else if (exp[i] == LEFT_B)
 			op_stack.push("(");
 		else if (exp[i] == RIGHT_B)
 		{
-			while (op_stack.top()[0] != LEFT_B)
-			{
-				res_stack.push(op_stack.top());
-				op_stack.pop();
-				if (op_stack.empty()){
-					cout << SYN_ERROR << exp[i] << endl;
-					return queue<string>();
-				}
-			}
-			if (!op_stack.empty())
-			{
-				if (op_stack.top()[0] != LEFT_B){
-					cout << SYN_ERROR << endl;
-					return queue<string>();
-				}
-				op_stack.pop();
-			}
+			if (!push_brackets(op_stack, res_queue))
+				return (put_error(exp[i]));
 		}
 	}
 	while (!op_stack.empty())
 	{
-		res_stack.push(op_stack.top());
+		res_queue.push(op_stack.top());
 		op_stack.pop();
 	}
-	return res_stack;
+	return res_queue;
 }

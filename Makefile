@@ -6,7 +6,7 @@ RM = rm -f
 
 FLG = -lreadline
 
-SRC = main.cpp utils.cpp infix_to_postfix.cpp eval_postfix.cpp
+SRC = main.cpp utils.cpp infix_to_postfix.cpp eval_postfix.cpp 
 OBJ = $(SRC:.cpp=.o)
 
 all: $(NAME)

@@ -6,7 +6,7 @@
 /*   By: zel-bouz <zel-bouz@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/26 04:58:18 by zel-bouz          #+#    #+#             */
-/*   Updated: 2023/05/26 06:04:19 by zel-bouz         ###   ########.fr       */
+/*   Updated: 2023/05/26 10:40:24 by zel-bouz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,15 +44,24 @@ using namespace std;
 #define BOLDCYAN     "\033[1m\033[36m"
 #define BOLDWHITE    "\033[1m\033[37m"
 
-
-
 #define PROMPT "\033[33mEnter Mathematic Expression : \033[0m"
 #define SYN_ERROR "\033[31mSyntax Error "
 
+// infix to postfix functions:
+void			push_operand(stack<string>& op_stack, queue<string>& que, map<char, int> prec, string op);
+void			push_num(queue<string>& que, string& exp, int& i);
+int				push_brackets(stack<string>& op_stack, queue<string>& que);
+queue<string>	infix_to_postfix(string exp, map<char, int> prec);
+
+
+// eval postfix functions:
+
+
+// utils functions:
 bool	is_operand(char c);
 bool	is_token(char c);
+void	init_precedence(map<char, int>& prec);
 
-queue<string>	infix_to_postfix(string exp, map<char, int> prec);
-int	eval_postfix(queue <string> pfix, int *ret);
+int	eval_postfix(queue <string> pfix, int& ret);
 
 #endif

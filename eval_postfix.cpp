@@ -6,7 +6,7 @@
 /*   By: zel-bouz <zel-bouz@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/26 05:39:45 by zel-bouz          #+#    #+#             */
-/*   Updated: 2023/05/26 06:29:23 by zel-bouz         ###   ########.fr       */
+/*   Updated: 2023/05/26 10:40:33 by zel-bouz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,16 +24,23 @@ int	calc(int n1, int n2, char op)
 	return (n1 / n2);
 }
 
-
-int	eval_postfix(queue <string> pfix, int *ret)
+static	int	put_error(int& ret, string err)
 {
-	stack<int> res;
-	string token;
+	if (!err.empty()){
+		cout << SYN_ERROR << err;
+		cout << RESET << endl;
+	}
+	ret = 0;
+	return (ret);
+}
 
-	int	num1;
-	int num2;
+int	eval_postfix(queue <string> pfix, int& ret)
+{
+	stack<int>	res;
+	string		token;
+	int			num1;
+	int			num2;
 
-	// print_post(pfix);
 	while (!pfix.empty())
 	{
 		token = pfix.front();
@@ -43,25 +50,18 @@ int	eval_postfix(queue <string> pfix, int *ret)
 		}
 		else if (is_operand(token[0]))
 		{
-			if (res.size() < 2) {
-				cout << SYN_ERROR << token << endl;
-				return (*ret = 0);
-			}
+			if (res.size() < 2)
+				return (put_error(ret, token));
 			num2 = res.top();
 			res.pop();
 			num1 = res.top();
 			res.pop();
-			if (token[0] == '/' && !num2) {
-				cout << SYN_ERROR << "Zero Devisions Error" << endl;
-				return (*ret = 0);
-			}
+			if (token[0] == '/' && !num2)
+				return (put_error(ret, "Zero Devisions Error"));
 			res.push((calc(num1, num2, token[0])));
 			pfix.pop();
 		}
 	}
-	if (res.size() != 1) {
-		cout << SYN_ERROR << endl;
-		return (*ret = 0);
-	}
-	return (*ret = 1, res.top());
+	if (res.size() != 1) return (put_error(ret, ""));
+	return (ret = 1, res.top());
 }

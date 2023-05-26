@@ -6,47 +6,60 @@
 /*   By: zel-bouz <zel-bouz@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/26 01:15:44 by zel-bouz          #+#    #+#             */
-/*   Updated: 2023/05/26 06:05:00 by zel-bouz         ###   ########.fr       */
+/*   Updated: 2023/05/26 10:40:01 by zel-bouz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 #include "Eval.hpp"
+
 using namespace std;
+
+void	display_results(string infix, queue<string> postfix, int res)
+{
+	// display infix result
+	cout << BOLDCYAN << "infix :\t\t";
+	cout << BOLDWHITE << infix << endl;
+	
+	// display postfix result
+	cout << BOLDGREEN << "postfix :\t" << BOLDWHITE;
+	while (!postfix.empty())
+	{
+		cout << postfix.front() << ' ';
+		postfix.pop();
+	}
+	cout << endl;
+	
+	// display result
+	cout << MAGENTA << "result :\t" << BOLDWHITE << res;
+	cout << RESET << endl;
+}
+
 
 int main()
 {
-	char	*infix;
-	int		res;
-	queue<string> postfix;
-	int triger = 1;
-	map<char, int> prec;
+	char			*infix;
+	int				res;
+	queue<string>	postfix;
+	int				triger;
+	map<char, int>	prec;
 
-	// init prec map
-	prec['+'] = 1;
-	prec['-'] = 1;
-	prec['/'] = 2;
-	prec['*'] = 2;
-
+	init_precedence(prec);
 	while (true)
 	{
 		infix = readline(PROMPT);
-		if (!infix)
-			return (1);
+		if (!infix || !strcmp(infix, "exit"))
+			return (0);
 		postfix = infix_to_postfix(infix, prec);
-		res = eval_postfix(postfix, &triger);
-		if (!triger)
+		if (postfix.empty())
 			continue;
-		// display result
-		cout << endl << BOLDCYAN << cout << "Infix: " <<  BOLDWHITE << infix << RESET << endl << endl;
-		cout << BOLDGREEN << "Postfix: " << BOLDWHITE;
-		while (!postfix.empty())
+		else
 		{
-			cout << postfix.front() << " ";
-			postfix.pop();
+			res = eval_postfix(postfix, triger);
+			if (!triger)
+				continue;
+			display_results(infix, postfix, res);
 		}
-		cout << RESET << endl << endl;
-		cout << MAGENTA  << "Resul : " << res << RESET << endl << endl;
 		add_history(infix);
 	}
 }
