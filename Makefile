@@ -1,17 +1,27 @@
 NAME = RPN
 
+CPP = c++ 
 
-src = main.cpp
-onj = $(src:cpp=.o)
+RM = rm -f
 
-re:clean all
+FLG = -lreadline
+
+SRC = main.cpp utils.cpp infix_to_postfix.cpp eval_postfix.cpp
+OBJ = $(SRC:.cpp=.o)
 
 all: $(NAME)
 
-$(NAME): $(obj)
-	c++ $(obj) main.cpp -o $@ -lreadline
+
+$(NAME): $(OBJ) 
+	$(CPP) $(FLG) $^ -o $@
+
 %.o: %.cpp 
-	c++ -lreadline $< -c -o $@
+	$(CPP) $< -c -o $@
 
 clean:
-	rm -fr $(obj) $(NAME)
+	$(RM) $(OBJ)
+
+fclean: clean
+	$(RM) $(NAME)
+
+re: fclean all
